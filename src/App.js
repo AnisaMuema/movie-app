@@ -15,6 +15,7 @@ function App() {
   const [search,setSearch]=useState("");
   const [selectedMovieId, setSelectedMovieId] = useState(null);
   const [selectedGenre, setSelectedGenre] = useState('All');
+  const [editMovie,setEditMovie] = useState(-1)
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -62,6 +63,8 @@ function App() {
    
   }
 
+  
+  
  
   
   
@@ -105,7 +108,8 @@ function App() {
                 path="/"
                 element={
                   selectedMovieId ? (
-                    <SingleMoviePage dataMovies={dataMovies} id={selectedMovieId} onDelete={handleDeleteClick}/>
+                    <SingleMoviePage dataMovies={dataMovies} id={selectedMovieId} onDelete={handleDeleteClick}
+                   />
                   ) : (
                     <MoviesPage
                       dataMovies={filteredMovies}

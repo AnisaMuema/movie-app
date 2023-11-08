@@ -1,78 +1,74 @@
-import React, { useEffect, useState } from 'react';
-import MoviesPage from './MoviesPage';
-import Sidebar from './Sidebar';
-import Search from './Search';
-import AddMovie from './AddMovie';
-import 'semantic-ui-css/semantic.min.css';
-import './App.css';
+import React, { useState, useEffect } from 'react';
 
 function App() {
-  const [dataMovies, setDataMovies] = useState([]);
-  const [showAddMovieForm, setShowAddMovieForm] = useState(false);
+  const [jsonData, setJsonData] = useState({});
+  const [editedData, setEditedData] = useState({});
+  const [isEditing, setIsEditing] = useState(false);
 
+  
   useEffect(() => {
-    fetch('http://localhost:3000/movies')
-      .then((resp) => resp.json())
-      .then((movies) => {
-        setDataMovies(movies);
-        console.log(movies);
-      });
+    fetch('http://example.com/api/data.json')
+      .then((response) => response.json())
+      .then((data) => {
+        setJsonData(data);
+        setEditedData(data); 
+      })
+      .catch((error) => console.error(error));
   }, []);
 
-  function handleAddMovie(newMovie) {
-    fetch('http://localhost:3000/movies', {
-      method: 'POST',
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
+
+  const handleSave = () => {
+    
+    fetch('http://example.com/api/updateData', {
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(newMovie),
+      body: JSON.stringify(editedData),
     })
-      .then((resp) => resp.json())
-      .then((movie) => {
-        setDataMovies([...dataMovies, movie]);
-        setShowAddMovieForm(false);
-      });
-  }
+      .then((response) => response.json())
+      .then((data) => {
+        setJsonData(data);
+        setIsEditing(false);
+      })
+      .catch((error) => console.error(error));
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    setEditedData(jsonData); 
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditedData({ ...editedData, [name]: value });
+  };
 
   return (
-    <div className="ui grid">
-      <div className="ui grid">
-      <div className='color-header'>
-       <div className="ui center aligned segment">
-        <div className="column">
-            <h1 className="ui header">Movie App</h1>
-       </div>
-      </div>
-       </div>
-      {showAddMovieForm ? (
-        <AddMovie onFormSubmit={handleAddMovie} onCancel={() => setShowAddMovieForm(false)} />
+    <div>
+      {isEditing ? (
+        <div>
+          <input
+            type="text"
+            name="title"
+            value={editedData.title}
+            onChange={handleInputChange}
+          />
+         
+          <button onClick={handleSave}>Save</button>
+          <button onClick={handleCancel}>Cancel</button>
+        </div>
       ) : (
-        <button onClick={() => setShowAddMovieForm(true)}>Add a movie</button>
+        <div>
+          <p>{jsonData.title}</p>
+         
+          <button onClick={handleEdit}>Edit</button>
+        </div>
       )}
-      <div className='custom-search-bar'>
-        
-        <Search/>
-
-      </div>
-      
-
-      <div className='container'>
-       <div className='three wide column'>
-         <div className='sidebar'>
-          <Sidebar/>
-         </div>
-        </div>
-    
-      <div className="twelve wide column custom-background">
-       
-        <div className="space-cards">
-          <MoviesPage dataMovies={dataMovies} />
-        </div>
-        </div>
-       </div>
-    </div>
     </div>
   );
 }
-
+}
 export default App;
